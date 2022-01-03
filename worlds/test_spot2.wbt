@@ -1,0 +1,31 @@
+#VRML_SIM R2021b utf8
+WorldInfo {
+  basicTimeStep 16
+  coordinateSystem "NUE"
+}
+Viewpoint {
+  orientation -0.12668400242007238 0.9865237729031271 0.10354713432930181 1.6988338703724188
+  position 8.955925638195136 1.7420753404632796 -1.7177433260300439
+  follow "Spot2:front right shoulder:front right upperarm:front right forearm:front right touch"
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+DEF MY_ROBOT Spot2 {
+  translation 0 0.004 0
+  controller "spot_controller"
+  supervisor TRUE
+  touch_type "force"
+}
+Solid {
+  translation 0 -0.7 0
+  children [
+    Shape {
+      geometry DEF Floor Box {
+        size 10 0.1 10
+      }
+    }
+  ]
+  boundingObject USE Floor
+}
