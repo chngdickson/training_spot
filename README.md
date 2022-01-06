@@ -4,7 +4,8 @@
 
 * This project is to learn to create a custom environment in webots to test out a quadruped robot environment for reinforcement learning.
 * It is a 3D version of the 2D env [Bipedal walker](https://gym.openai.com/envs/BipedalWalker-v2/).
-* I chose to use SAC written by stable baselines for this project as it was more stable in comparison to the algorithms i personally written and tested out in my other github page.
+* I chose to use stable baselines for this project as it was more stable in comparison to the algorithms i personally written and tested out in my other github project.
+* SAC was chosen out of DDPG, SAC and PPO as it yields better results.
 
 
 
