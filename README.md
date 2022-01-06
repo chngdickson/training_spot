@@ -29,4 +29,4 @@ There are 2 controllers in this world.
 * 970 Graphics card or higher
 
 ### Improvements for the future
-In the future i'd probably pair up a camera with yolov5 for feature selection then pass those features to the RL algorithm to train to walk as this project is just a simple imitation of upgrading the 2D environment of Bipedal walker.
+In the future i'd probably pair up a camera with yolov5 for feature selection then pass those features to the RL algorithm to train to walk. 
