@@ -392,40 +392,7 @@ class myRLEnv(Supervisor, gym.Env):
     
 
 
-def main():
-    # SAC
-    env = myRLEnv()
-    check_env(env)
-    
-    # try high Tau > 0.5 , vs low tau < 0.1, High tau leads to instability
-    # auto entropy coefficient: 1.0 means start with high randomness
-    #
-    
-    # Custom actor architecture with two layers of 64 units each
-    # Custom critic architecture with two layers of 400 and 300 units
-    policy_kwargs = dict(net_arch=[256, 256, 256 ])
-    model = SAC('MlpPolicy', env, verbose=1, device="cuda",
-                batch_size=5120,buffer_size=510000, learning_starts=5000, 
-                tau=0.001 ,gamma=0.99,learning_rate=0.0005,
-                use_sde=True, sde_sample_freq=10,  ent_coef = 'auto',
-                policy_kwargs = policy_kwargs,
-                train_freq=1,target_update_interval=1
-    )
-    
-    #model.collect_rollouts(replay_buffer=ReplayBuffer, learning_starts=10000)
-    model.learn(total_timesteps=1_000_000, log_interval=4)
-    model.save("sac_walking2")
-    
-    del model
-    
-    model = SAC.load("sac_walking2")
- 
-    obs = env.reset()
-    for _ in range(100000):
-        action = model.predict(obs, deterministic=False)
-        obs,reward, done, info = env.step(action)
-        if done:
-            obs = env.reset()
+
 
 from EnvRunner import EnvRunner   
             
@@ -436,7 +403,7 @@ def linear_schedule(initial_value: float,final_value = 0.00025) -> Callable[[flo
     return func
 
 from stable_baselines3.common.callbacks import CheckpointCallback
-def main3():
+def main():
     seed = 0
     torch.manual_seed(seed)
     np.random.seed(seed)
@@ -494,7 +461,6 @@ import sys
 if __name__ == '__main__':
     print(sys.executable)
     #main()
-    #main3()
     eval('logs/successfulvibrate/spot_sac_vibrate_walking_1200000_steps')
     
     
