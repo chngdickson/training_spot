@@ -16,8 +16,11 @@
 * Install open ai gym in your python environment. <https://gym.openai.com/docs/>
 
 ## Usage
+To run the program, Open worlds/test_spot4.wbt in webots.
+
+If there are any issues with running the world, please change the controller being used by spot referred to below.
 There are 2 controllers in this world.
-* spot_controller - To test out if the controllers are running correctly in your system
+* spot_controller - To test out if the controllers are running correctly in your system.
 * rl_controller - To run the spot robot using the trained model of RL controller.
 
 
