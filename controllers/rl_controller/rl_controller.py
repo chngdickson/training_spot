@@ -17,9 +17,11 @@ from typing import Callable
 
 class myRLEnv(Supervisor, gym.Env):
     
-    def __init__(self, reward_scale = 0.1, max_episode_steps=1000):
+    def __init__(self, reward_scale = 0.1, max_episode_steps=1000, torque=False):
         super().__init__()
-        
+        # Personal Preference
+        self.use_torque = torque
+
         #Environment Specific
         self.__timestep = int(self.getBasicTimeStep())
         self.torque_multiplier = 1
@@ -30,6 +32,7 @@ class myRLEnv(Supervisor, gym.Env):
         self.action_space = self.create_action_space()
         self.observation_space = self.create_observation_space(reset_state)  
         self.reward_scale = reward_scale
+        
         print('obs_shape',self.observation_space.shape)  # 29
         print(self.action_space.shape[0]) #8
         
@@ -83,14 +86,15 @@ class myRLEnv(Supervisor, gym.Env):
         
         self.max_motor_torques = []
         for i, motor in enumerate(self.__motors):
-            motor.setPosition(float('inf'))
-            motor.setVelocity(0)
-            
-            self.max_motor_torques.append(motor.getAvailableTorque())
-            #motor.setTorque(0)
+            if self.use_torque:
+                motor.setTorque(0)
+            else:
+                motor.setPosition(float('inf'))
+                motor.setVelocity(0)
+                
             # if i in [1,3,5,7]:
             #     motor.enableTorqueFeedback(self.__timestep)
-            
+            self.max_motor_torques.append(motor.getAvailableTorque())
             pos_sensor = motor.getPositionSensor()
             pos_sensor.enable(self.__timestep)
             self.pos_sensors.append(pos_sensor)
@@ -100,6 +104,7 @@ class myRLEnv(Supervisor, gym.Env):
         # Return State
         state = self.get_states()
         self.prev_shaping = None
+
         #print('reset_state_len',len(state))
         return state
     
@@ -115,12 +120,13 @@ class myRLEnv(Supervisor, gym.Env):
                 # vel = 0
                 # force = motor.getMaxForce() * np.clip(actions[i].item(),-1,1)
                 # motor.setForce(force)
-                
-                # tor = motor.getMaxTorque() * np.clip(actions[i].item(), -1, 1)
-                # motor.setTorque(tor)-
+                if self.use_torque:
+                    tor = motor.getMaxTorque()* np.clip(actions[i].item(), -1, 1)
+                    motor.setTorque(tor)
                 #print(tor)
-                vel = motor.getMaxVelocity() * np.clip(actions[i].item(),-1,1)
-                motor.setVelocity(vel)
+                else:
+                    vel = motor.getMaxVelocity() * np.clip(actions[i].item(),-1,1)
+                    motor.setVelocity(vel)
             except:
                 print(f"Error found: {actions}")
                 assert False, 'Hello'
@@ -244,11 +250,11 @@ class myRLEnv(Supervisor, gym.Env):
         #print(state[3], state[4], state[5])
         return bool(
             threshold(self.pos[0],-0.2, 15) or 
-            threshold(self.pos[1],-0.35, 0.2) or
+            threshold(self.pos[1],-0.35, 0.7) or
             threshold(self.pos[2], -1, 1) or
             threshold(state[3], -threshold_rotation, threshold_rotation) or
             # threshold(state[4], -threshold_rotation, threshold_rotation) or 
-            threshold(state[5], -0.5, 0.75) 
+            threshold(state[5], 0, 1.0) 
             # threshold(state[6], -acc, acc) or
             # threshold(state[7], -acc, acc) or
             # threshold(state[8], -acc, acc) 
@@ -263,30 +269,34 @@ class myRLEnv(Supervisor, gym.Env):
         self.prev_shaping = shaping
         
         # Carrot
-        #forward_vel = float(5.0*state[0]) # Forward 
-        timestep = float(self.__timestep)/5
+        forward_vel = float(15.0*state[0]) # Forward 
+        timestep = float(self.__timestep/1000)
         
         # stick
         # Keep head parallel to the ground
-        rotation_x = float(10.0* abs(state[3]))
+        rotation_x = float(5.0* abs(state[3]))
         # Make sure robot goes in a straight line
-        rotation_y = float(10.0* abs( state[5] - (0.5)  ) ) 
-        desired_height = float(10.0*abs(self.pos[1]))
-        efforts = 0
+        rotation_y = float(5.0* (abs(state[5] + 0.5)) ) 
+        desired_height = float(5.0*abs(self.pos[1]))
+        
+        efforts = 0        
         for i,a in enumerate(actions):
-            efforts += 0.0035 * self.max_motor_torques[i] * np.clip(np.abs(a), 0, 1)
+            efforts += 0.06 * np.clip(np.abs(a), 0, 1)
         #print(efforts)
         #reward = 3*forward_vel + timestep - desired_height - actuator_effort
-        reward = forward_rew + timestep - (rotation_x + rotation_y + desired_height + efforts) 
+        reward = forward_vel + timestep - (rotation_x + rotation_y + desired_height + efforts) 
+
         if done:
             # if self.pos[0] >= self.max_pos:
             #     reward += 100
             # else:
-            reward -= 40
-            # print(f'#######################\n##########################\
-            #       \nforward {forward_rew:2f} \ntimestep {timestep:2f}\
-            #       \nrotation_x {rotation_x:2f} \nrotation_y {rotation_y:2f} \
-            #       \ndesired_height {desired_height:2f} \nefforts {efforts:2f}')
+            
+            reward -= 200
+            # Gift a hefty negative reward to speed up training. In reality what ended up was the robot ends up at a local optima after that time.
+            #print(f'#######################\n##########################\
+            #      \nforward {forward_rew:2f} \ntimestep {timestep:2f}\
+            #      \nrotation_x {rotation_x:2f} \nrotation_y {rotation_y:2f} \
+            #      \ndesired_height {desired_height:2f} \nefforts {efforts:2f}')
         return reward*self.reward_scale
         
     def initialize_sensors(self,device_names:list, enable_func_exist=True):
@@ -403,13 +413,13 @@ def main():
     )
     
     #model.collect_rollouts(replay_buffer=ReplayBuffer, learning_starts=10000)
-    model.learn(total_timesteps=1000000, log_interval=4)
+    model.learn(total_timesteps=1_000_000, log_interval=4)
     model.save("sac_walking2")
     
     del model
     
     model = SAC.load("sac_walking2")
-    
+ 
     obs = env.reset()
     for _ in range(100000):
         action = model.predict(obs, deterministic=False)
@@ -418,23 +428,6 @@ def main():
             obs = env.reset()
 
 from EnvRunner import EnvRunner   
-def main2():
-    # Using Oagma Neo
-    
-    env = myRLEnv()
-    check_env(env)
-    runner = EnvRunner(env, terminalReward=-100.0, rewardScale=0.0) # Cart-Pole environment always returns a reward of 1, so use a custom reward function: -1 if episode ends, 0 otherwise
-
-    for episode in range(10000):
-        env.reset()
-
-        # Timesteps
-        for t in range(500):
-            done, _ = runner.act() # Step the environment and agent
-            if done:
-                print("Episode {} finished after {} timesteps".format(episode + 1, t + 1))
-                
-                break
             
 def linear_schedule(initial_value: float,final_value = 0.00025) -> Callable[[float], float]:
     def func(progress_remaining: float) -> float:
@@ -470,10 +463,10 @@ def main3():
         )
 
     
-    checkpoint_callback = CheckpointCallback(save_freq=10000, save_path='./logs/',
+    checkpoint_callback = CheckpointCallback(save_freq=50000, save_path='./logs/',
                                          name_prefix=save_name)
     
-    model.learn(total_timesteps=1_000_000, log_interval= 100, callback=checkpoint_callback)
+    model.learn(total_timesteps=2_000_000, log_interval= 100, callback=checkpoint_callback)
     model.save(save_name)
     del model
     
@@ -481,6 +474,7 @@ def main3():
 def eval(save_name:str):
     env = myRLEnv()
     model = SAC.load(save_name)
+    print('loaded')
     obs = env.reset()
     while True:
         action, not_action = model.predict(obs, deterministic=False)
@@ -500,7 +494,7 @@ import sys
 if __name__ == '__main__':
     print(sys.executable)
     #main()
-    main3()
-    #eval('spot_sac_vibrate_walking')
+    #main3()
+    eval('logs/successfulvibrate/spot_sac_vibrate_walking_1200000_steps')
     
     

@@ -1,0 +1,300 @@
+#VRML_SIM R2021b utf8
+WorldInfo {
+  basicTimeStep 16
+  coordinateSystem "NUE"
+}
+Viewpoint {
+  orientation 0.03815294568265232 0.9660067227146276 0.25568606611601097 3.4279115334097083
+  position -1.2466335731397304 2.821671558781604 -4.7719634877454995
+  follow "Spot"
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Solid {
+  translation 7.2 -0.611 0
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "C:/Users/Dicks/Documents/webots/ai_project/libraries/images/racing-track-start-finish-line-competition-concept-vector-illustration-eps-184210027.jpg"
+          ]
+        }
+        roughness 1
+        roughnessMap ImageTexture {
+          url [
+            "C:/Users/Dicks/Documents/webots/ai_project/libraries/images/racing-track-start-finish-line-competition-concept-vector-illustration-eps-184210027.jpg"
+          ]
+        }
+        metalness 0
+      }
+      geometry DEF PLANE Plane {
+        size 16 3
+      }
+    }
+  ]
+  boundingObject USE PLANE
+}
+DEF MY_ROBOT Spot {
+  translation 0 0 0
+  rotation 0 1 0 1.5708
+  controller "torque_controller"
+  supervisor TRUE
+  rearExtension [
+    DistanceSensor {
+      translation 0 -0.1 0.253
+      rotation 0 -0.0627446429775964 -0.9980296136776774 1.573
+      children [
+        Shape {
+          geometry DEF distance_sensor Box {
+            size 0.01 0.01 0.01
+          }
+        }
+      ]
+      boundingObject USE distance_sensor
+      physics Physics {
+      }
+      translationStep 1
+      radarCrossSection 1
+      lookupTable [
+        0 0 0
+        0.75 1000 0
+      ]
+      type "infra-red"
+      numberOfRays 11
+      aperture 0.34
+      resolution 1
+      redColorSensitivity 0
+    }
+  ]
+}
+Solid {
+  translation 5.71 -1.15 -4.22401e-06
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 1
+        metalness 0
+      }
+      geometry DEF obstacle Cylinder {
+        height 2.8
+        radius 0.6
+      }
+    }
+  ]
+  name "solid(11)"
+  boundingObject USE obstacle
+}
+Solid {
+  translation 4.59 -1.16 -4.26074e-06
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 1
+        metalness 0
+      }
+      geometry DEF obstacle Cylinder {
+        height 2.8
+        radius 0.6
+      }
+    }
+  ]
+  name "solid(1)"
+  boundingObject USE obstacle
+}
+Solid {
+  translation 3.69 -1.16 -4.26074e-06
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 1
+        metalness 0
+      }
+      geometry DEF obstacle Cylinder {
+        height 2.8
+        radius 0.6
+      }
+    }
+  ]
+  name "solid(2)"
+  boundingObject USE obstacle
+}
+Solid {
+  translation 2.39 -1.16 -4.26074e-06
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 1
+        metalness 0
+      }
+      geometry DEF obstacle Cylinder {
+        height 2.8
+        radius 0.6
+      }
+    }
+  ]
+  name "solid(3)"
+  boundingObject USE obstacle
+}
+Solid {
+  translation 1.47 -1.16 -4.26074e-06
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 1
+        metalness 0
+      }
+      geometry DEF obstacle Cylinder {
+        height 2.8
+        radius 0.6
+      }
+    }
+  ]
+  name "solid(4)"
+  boundingObject USE obstacle
+}
+Solid {
+  translation 8.08 -1.15 -4.22401e-06
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 1
+        metalness 0
+      }
+      geometry DEF obstacle Cylinder {
+        height 2.8
+        radius 0.6
+      }
+    }
+  ]
+  name "solid(21)"
+  boundingObject USE obstacle
+}
+Solid {
+  translation 8.93 -1.13 -4.15055e-06
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 1
+        metalness 0
+      }
+      geometry DEF obstacle Cylinder {
+        height 2.8
+        radius 0.6
+      }
+    }
+  ]
+  name "solid(23)"
+  boundingObject USE obstacle
+}
+Solid {
+  translation 10.09 -1.1 -4.04036e-06
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 1
+        metalness 0
+      }
+      geometry DEF obstacle Cylinder {
+        height 2.8
+        radius 0.6
+      }
+    }
+  ]
+  name "solid(25)"
+  boundingObject USE obstacle
+}
+Solid {
+  translation 11.32 -1.11 -4.07709e-06
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 1
+        metalness 0
+      }
+      geometry DEF obstacle Cylinder {
+        height 2.8
+        radius 0.6
+      }
+    }
+  ]
+  name "solid(27)"
+  boundingObject USE obstacle
+}
+Solid {
+  translation 13.46 -1.13 -4.15055e-06
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 1
+        metalness 0
+      }
+      geometry DEF obstacle Cylinder {
+        height 2.8
+        radius 0.6
+      }
+    }
+  ]
+  name "solid(31)"
+  boundingObject USE obstacle
+}
+Solid {
+  translation 12.3 -1.1 -4.04036e-06
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 1
+        metalness 0
+      }
+      geometry DEF obstacle Cylinder {
+        height 2.8
+        radius 0.6
+      }
+    }
+  ]
+  name "solid(30)"
+  boundingObject USE obstacle
+}
+Solid {
+  translation 7.06 -1.15 -4.22401e-06
+  rotation 1 0 0 1.5708
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+        roughness 1
+        metalness 0
+      }
+      geometry DEF obstacle Cylinder {
+        height 2.8
+        radius 0.6
+      }
+    }
+  ]
+  name "solid(18)"
+  boundingObject USE obstacle
+}
